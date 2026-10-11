@@ -7,9 +7,9 @@ bot:
     name: "chromavisionmusic"
 
   links:
-    invite:
+    invite: "https://discord.com/oauth2/authorize?client_id=1556011663688339537&permissions=275414780928&integration_type=0&scope=bot+applications.commands"
     website:
-    server:
+    server: "https://discord.gg/moonmaiden"
     github: "https://github.com/chromavisionmusic/hoyocodes"
 
   presence:
