@@ -9,9 +9,12 @@ import (
 var Commands = []discord.ApplicationCommandCreate{
 	PingCommandMetadata,
 	AboutCommandMetadata,
+	CodesCommandMetadata,
 }
 
 func LoadCommands(handler *handler.Mux, cfg *config.Config) {
 	handler.SlashCommand("/ping", PingCommandHandler)
 	handler.SlashCommand("/about", AboutCommandHandler(cfg))
+	handler.SlashCommand("/codes", CodesCommandHandler(cfg))
 }
+
