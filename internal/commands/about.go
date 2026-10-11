@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/chromavisionmusic/hoyocodes/internal/config"
@@ -54,8 +55,25 @@ func AboutCommandHandler(cfg *config.Config) handler.SlashCommandHandler {
 			AddField("Guilds", fmt.Sprintf("%d", guilds), true).
 			AddField("Commands", fmt.Sprintf("%d", len(Commands)), true)
 
-		return e.CreateMessage(discord.MessageCreate{
-			Embeds: []discord.Embed{embed},
-		})
+		var buttons []discord.InteractiveComponent
+		if link := strings.TrimSpace(cfg.Bot.Links.Invite); link != "" {
+			buttons = append(buttons, discord.NewLinkButton("Invite", link))
+		}
+		if link := strings.TrimSpace(cfg.Bot.Links.Website); link != "" {
+			buttons = append(buttons, discord.NewLinkButton("Website", link))
+		}
+		if link := strings.TrimSpace(cfg.Bot.Links.Server); link != "" {
+			buttons = append(buttons, discord.NewLinkButton("Support Server", link))
+		}
+
+		msg := discord.MessageCreate{
+			Content: fmt.Sprintf("-# <:INFO:1558891003874910259> Interested in contributing to the project? Checkout out the [Github](%s) repo and give it a star.", cfg.Bot.Links.Github),
+			Embeds:  []discord.Embed{embed},
+		}
+		if len(buttons) > 0 {
+			msg = msg.AddActionRow(buttons...)
+		}
+
+		return e.CreateMessage(msg)
 	}
 }
