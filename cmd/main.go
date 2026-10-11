@@ -69,7 +69,13 @@ func main() {
 	}
 
 	commands.LoadCommands(cmd, cfg)
-	if err := handler.SyncCommands(client, commands.Commands, []snowflake.ID{env.GuildId}); err != nil {
+
+	var guildIDs []snowflake.ID
+	if environment == "development" || environment == "dev" {
+		guildIDs = []snowflake.ID{env.GuildId}
+	}
+
+	if err := handler.SyncCommands(client, commands.Commands, guildIDs); err != nil {
 		panic(err)
 	}
 	fmt.Printf("Synced %d commands\n", len(commands.Commands))
