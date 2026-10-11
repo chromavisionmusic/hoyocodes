@@ -9,9 +9,11 @@ import (
 )
 
 type Env struct {
-	Token        string
-	GuildId      snowflake.ID
-	DatabasePath string
+	Token         string
+	GuildId       snowflake.ID
+	DatabasePath  string
+	EventsWebhook string
+	LogsWebhook   string
 }
 
 func LoadEnv(environment string) Env {
@@ -47,9 +49,21 @@ func LoadEnv(environment string) Env {
 		logLevel = "info"
 	}
 
+	eventsWebhook := os.Getenv("BOT_EVENTS_WEBHOOK")
+	if eventsWebhook == "" {
+		eventsWebhook = os.Getenv("EVENTS_WEBHOOK")
+	}
+
+	logsWebhook := os.Getenv("BOT_LOGS_WEBHOOK")
+	if logsWebhook == "" {
+		logsWebhook = os.Getenv("LOGS_WEBHOOK")
+	}
+
 	return Env{
-		Token:        token,
-		GuildId:      snowflake.GetEnv("GUILD_ID"),
-		DatabasePath: dbPath,
+		Token:         token,
+		GuildId:       snowflake.GetEnv("GUILD_ID"),
+		DatabasePath:  dbPath,
+		EventsWebhook: eventsWebhook,
+		LogsWebhook:   logsWebhook,
 	}
 }

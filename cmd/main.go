@@ -11,6 +11,7 @@ import (
 	"github.com/chromavisionmusic/hoyocodes/internal/commands"
 	"github.com/chromavisionmusic/hoyocodes/internal/config"
 	"github.com/chromavisionmusic/hoyocodes/internal/database"
+	botEvents "github.com/chromavisionmusic/hoyocodes/internal/events"
 	"github.com/chromavisionmusic/hoyocodes/internal/utils"
 	"github.com/disgoorg/disgo"
 	"github.com/disgoorg/disgo/bot"
@@ -57,9 +58,12 @@ func main() {
 	// Command handler
 	cmd := handler.New()
 
+	// Event handler
+	eventHandler := botEvents.NewHandler(cfg, env)
+
 	// Create a new client instance
 	client, err := disgo.New(env.Token,
-		bot.WithEventListeners(cmd),
+		bot.WithEventListeners(cmd, eventHandler),
 		// Set gateway configuration options
 		bot.WithGatewayConfigOpts(
 			// Set enabled intents
@@ -100,6 +104,7 @@ func main() {
 	defer func() {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
+		eventHandler.Close(ctx)
 		client.Close(ctx)
 	}()
 
