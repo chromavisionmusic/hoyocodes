@@ -1,0 +1,18 @@
+bot:
+  name: "HoyoCodes"
+  description: "A Discord bot that automatically sends active HoYoverse redeem codes to your server, so your community never misses a new code."
+  version: "0.1.0"
+  owner:
+    id: "1063860912173359114"
+    name: "chromavisionmusic"
+
+  links:
+    invite:
+    website:
+    server:
+    github: "https://github.com/chromavisionmusic/hoyocodes"
+
+  presence:
+    status: "idle"
+    activity_type: "watching"
+    activity: "new redeem codes | v0.1.0"

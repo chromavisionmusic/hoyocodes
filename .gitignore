@@ -1,0 +1,37 @@
+# Binaries and build outputs
+build/
+bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test and profiling artifacts
+*.test
+*.out
+coverage.txt
+profile.pprof
+
+# Delve debug binaries
+__debug_bin*
+
+# Environment files and secrets
+.env
+.env.*
+!.env.example
+
+# Log files
+*.log
+
+# Editor and IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Operating System files
+.DS_Store
+Thumbs.db
+desktop.ini
