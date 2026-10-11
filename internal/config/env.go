@@ -9,8 +9,9 @@ import (
 )
 
 type Env struct {
-	Token   string
-	GuildId snowflake.ID
+	Token        string
+	GuildId      snowflake.ID
+	DatabasePath string
 }
 
 func LoadEnv(environment string) Env {
@@ -33,10 +34,13 @@ func LoadEnv(environment string) Env {
 		panic("ENV is required!")
 	}
 
-	// databaseURL := os.Getenv("DATABASE_URL")
-	// if databaseURL == "" {
-	// 	panic("DATABASE_URL is required!")
-	// }
+	dbPath := os.Getenv("DATABASE_PATH")
+	if dbPath == "" {
+		dbPath = os.Getenv("DATABASE_URL")
+	}
+	if dbPath == "" {
+		dbPath = "data/hoyocodes.db"
+	}
 
 	logLevel := os.Getenv("LOG_LEVEL")
 	if logLevel == "" {
@@ -44,7 +48,8 @@ func LoadEnv(environment string) Env {
 	}
 
 	return Env{
-		Token:   token,
-		GuildId: snowflake.GetEnv("GUILD_ID"),
+		Token:        token,
+		GuildId:      snowflake.GetEnv("GUILD_ID"),
+		DatabasePath: dbPath,
 	}
 }

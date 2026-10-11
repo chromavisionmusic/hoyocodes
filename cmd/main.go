@@ -2,8 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
-	"log"
 	"os"
 	"os/signal"
 	"strings"
@@ -11,8 +9,10 @@ import (
 	"time"
 
 	// Import DisGo packages
+	"charm.land/log/v2"
 	"github.com/chromavisionmusic/hoyocodes/internal/commands"
 	"github.com/chromavisionmusic/hoyocodes/internal/config"
+	"github.com/chromavisionmusic/hoyocodes/internal/database"
 	"github.com/disgoorg/disgo"
 	"github.com/disgoorg/disgo/bot"
 	"github.com/disgoorg/disgo/cache"
@@ -38,6 +38,24 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// Initialize SQLite database
+	db, err := database.New(env.DatabasePath)
+	if err != nil {
+		log.Fatalf("Failed to initialize database: %v", err)
+	}
+	defer func() {
+		if err := db.Close(); err != nil {
+			log.Printf("Error closing database: %v", err)
+		}
+	}()
+
+	dbCtx, dbCancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer dbCancel()
+	if err := db.Migrate(dbCtx); err != nil {
+		log.Fatalf("Failed to run database migrations: %v", err)
+	}
+	log.Info("Connected to SQLite database")
+
 	// Command handler
 	cmd := handler.New()
 
@@ -61,14 +79,14 @@ func main() {
 		),
 		// Listen to the Ready event in order to know when the bot is connected
 		bot.WithEventListenerFunc(func(e *events.Ready) {
-			fmt.Println("Bot is connected as", e.User.Username)
+			log.Infof("Bot is connected as %s", e.User.Username)
 		}),
 	)
 	if err != nil {
 		panic(err)
 	}
 
-	commands.LoadCommands(cmd, cfg)
+	commands.LoadCommands(cmd, cfg, db)
 
 	var guildIDs []snowflake.ID
 	if environment == "development" || environment == "dev" {
@@ -78,7 +96,7 @@ func main() {
 	if err := handler.SyncCommands(client, commands.Commands, guildIDs); err != nil {
 		panic(err)
 	}
-	fmt.Printf("Synced %d commands\n", len(commands.Commands))
+	log.Infof("Synced %d commands", len(commands.Commands))
 
 	// Ensure we close the client on exit
 	defer func() {
@@ -95,11 +113,11 @@ func main() {
 	}
 
 	// Wait here until CTRL+C or other term signal is received.
-	fmt.Println("Bot is now running. Press CTRL+C to exit.")
+	log.Info("Bot is now running. Press CTRL+C to exit.")
 	s := make(chan os.Signal, 1)
 	signal.Notify(s, syscall.SIGINT, syscall.SIGTERM)
 	<-s
-	fmt.Println("Shutting down bot...")
+	log.Info("Shutting down bot...")
 }
 
 func getPresenceOpts(presence config.Presence) []gateway.PresenceOpt {
